@@ -24,6 +24,7 @@ import products.views as products
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', products.index, name='index'),
+    path('users/', include('users.urls', namespace='users')),
     path('products/', include('products.urls', namespace='products')),
 ]
 
