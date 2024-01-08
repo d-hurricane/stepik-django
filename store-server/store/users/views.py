@@ -1,7 +1,10 @@
-from django.shortcuts import render, reverse
-from django.http import HttpResponseRedirect as redirect
+from django.shortcuts import render, redirect
 from django.contrib import auth
-from users.forms import UserLoginForm, UserRegistrationForm
+from users.forms import (
+    UserLoginForm,
+    UserRegistrationForm,
+    UserProfileForm,
+)
 
 
 def login(request):
@@ -13,7 +16,7 @@ def login(request):
             user = auth.authenticate(username=username, password=password)
             if user:
                 auth.login(request, user)
-                return redirect(reverse('index'))
+                return redirect('index')
     else:
         form = UserLoginForm()
     context = {
@@ -28,7 +31,7 @@ def register(request):
         form = UserRegistrationForm(data=request.POST)
         if form.is_valid():
             form.save()
-            return redirect(reverse('users:login'))
+            return redirect('users:login')
     else:
         form = UserRegistrationForm()
     context = {
@@ -36,3 +39,22 @@ def register(request):
         'form': form,
     }
     return render(request, 'users/register.html', context)
+
+
+def profile(request):
+    if request.method == 'POST':
+        form = UserProfileForm(
+            instance=request.user,
+            data=request.POST,
+            files=request.FILES,
+        )
+        if form.is_valid():
+            form.save()
+            redirect('users:profile')
+    else:
+        form = UserProfileForm(instance=request.user)
+    context = {
+        'title': 'Store - Профиль',
+        'form': form,
+    }
+    return render(request, 'users/profile.html', context)

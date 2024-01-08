@@ -1,10 +1,14 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import (
+    AuthenticationForm as BaseAuthenticationForm,
+    UserCreationForm as BaseUserCreationForm,
+    UserChangeForm as BaseUserChangeForm,
+)
 
 import users.models as models
 
 
-class UserLoginForm(AuthenticationForm):
+class UserLoginForm(BaseAuthenticationForm):
     class Meta:
         model = models.User
         fields = ('username', 'password')
@@ -19,7 +23,7 @@ class UserLoginForm(AuthenticationForm):
     }))
 
 
-class UserRegistrationForm(UserCreationForm):
+class UserRegistrationForm(BaseUserCreationForm):
     class Meta:
         model = models.User
         fields = (
@@ -66,4 +70,44 @@ class UserRegistrationForm(UserCreationForm):
         widget=forms.PasswordInput(attrs={
             'class': 'form-control py-4',
             'placeholder': 'Подтвердите пароль',
+        }))
+
+
+class UserProfileForm(BaseUserChangeForm):
+    class Meta:
+        model = models.User
+        fields = (
+            'first_name',
+            'last_name',
+            'username',
+            'email',
+            'image',
+        )
+
+    first_name = forms.CharField(
+        label='Имя',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control py-4',
+        }))
+    last_name = forms.CharField(
+        label='Фамилия',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control py-4',
+        }))
+    username = forms.CharField(
+        label='Имя пользователя',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control py-4',
+            'readonly': True,
+        }))
+    email = forms.CharField(
+        label='Адрес электронной почты',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control py-4',
+            'readonly': True,
+        }))
+    image = forms.ImageField(
+        label='Выберете изображение',
+        widget=forms.FileInput(attrs={
+            'class': 'custom-file-input',
         }))
