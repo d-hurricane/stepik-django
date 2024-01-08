@@ -5,6 +5,9 @@ from users.forms import (
     UserRegistrationForm,
     UserProfileForm,
 )
+from products.views import (
+    Basket,
+)
 
 
 def login(request):
@@ -57,6 +60,7 @@ def profile(request):
     context = {
         'title': 'Store - Профиль',
         'form': form,
+        'basket': Basket.objects.filter(user=request.user),
     }
     return render(request, 'users/profile.html', context)
 

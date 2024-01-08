@@ -1,13 +1,5 @@
 from django.db import models
-
-
-def catalog_presentation(instance):
-    result = str(instance.name)
-    if result.isspace():
-        result = '<>'
-    code = str(instance.id) if instance.id else 'create'
-    result = '{} ({})'.format(result, code)
-    return result
+from users.models import User
 
 
 class ProductCategory(models.Model):
@@ -15,7 +7,7 @@ class ProductCategory(models.Model):
     description = models.TextField(blank=True)
 
     def __str__(self):
-        return catalog_presentation(self)
+        return self.name
 
 
 class Product(models.Model):
@@ -27,4 +19,27 @@ class Product(models.Model):
     quantity = models.PositiveIntegerField()
 
     def __str__(self):
-        return catalog_presentation(self)
+        return self.name
+
+
+class BasketQuerySet(models.QuerySet):
+    def total_sum(self):
+        return sum(item.sum() for item in self)
+
+    def total_quantity(self):
+        return sum(item.quantity for item in self)
+
+
+class Basket(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+    product = models.ForeignKey(to=Product, on_delete=models.PROTECT)
+    quantity = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = BasketQuerySet.as_manager()
+
+    def __str__(self):
+        return f'{self.user} | {self.product}'
+
+    def sum(self):
+        return self.product.price * self.quantity
