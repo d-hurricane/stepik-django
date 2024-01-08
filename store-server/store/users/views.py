@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib import auth
+from django.contrib import auth, messages
 from users.forms import (
     UserLoginForm,
     UserRegistrationForm,
@@ -31,6 +31,7 @@ def register(request):
         form = UserRegistrationForm(data=request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Вы успешно зарегистрировались.')
             return redirect('users:login')
     else:
         form = UserRegistrationForm()
