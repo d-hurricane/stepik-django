@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from products.models import *
 
 
@@ -15,10 +16,17 @@ def products(request, category_id=None):
         products_set = Product.objects.filter(category_id=category_id)
     else:
         products_set = Product.objects.all()
+    products_set.order_by('id')
+
+    paginator = Paginator(products_set, per_page=3)
+    page_number = request.GET.get('page', 1)
+    page = paginator.page(page_number)
+
     context = {
         'title': 'Store - Каталог',
         'categories': ProductCategory.objects.all(),
-        'products': products_set,
+        'products': page,
+        'page_numbers': paginator.get_elided_page_range(page_number, on_each_side=2, on_ends=0),
     }
     return render(request, 'products/products.html', context)
 
