@@ -3,6 +3,9 @@ from users.models import User
 
 
 class ProductCategory(models.Model):
+    class Meta:
+        verbose_name_plural = 'Categories'
+
     name = models.CharField(max_length=128)
     description = models.TextField(blank=True)
 

@@ -1,6 +1,15 @@
 from django.contrib import admin
 
 import users.models as users
+import products.models as products
 
 
-admin.site.register(users.User)
+class BasketInline(admin.TabularInline):
+    model = products.Basket
+    extra = 0
+
+
+@admin.register(users.User)
+class UserAdmin(admin.ModelAdmin):
+    exclude = ('password', )
+    inlines = (BasketInline, )
