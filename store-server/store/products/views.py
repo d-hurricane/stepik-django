@@ -1,14 +1,42 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.views.generic import TemplateView
+from django.views.generic import ListView
+
 from products.models import *
 
 
-def index(request):
-    context = {
-        'title': 'Store',
-    }
-    return render(request, 'products/index.html', context)
+class IndexView(TemplateView):
+    template_name = 'products/index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Store'
+        return context
+
+
+class ProductListView(ListView):
+    model = Product
+    template_name = 'products/products.html'
+    context_object_name = 'products'
+    paginate_by = 3
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if 'category_id' in self.kwargs:
+            queryset = queryset.filter(category_id=self.kwargs['category_id'])
+        return queryset
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=object_list, **kwargs)
+        context['title'] = 'Store - Каталог'
+        context['categories'] = ProductCategory.objects.all()
+        context['get_page_numbers'] = self.get_page_numbers
+        return context
+
+    def get_page_numbers(self):
+        return []
 
 
 def products(request, category_id=None):
