@@ -13,3 +13,6 @@ class BasketInline(admin.TabularInline):
 class UserAdmin(admin.ModelAdmin):
     exclude = ('password', )
     inlines = (BasketInline, )
+
+
+admin.site.register(users.EmailVerification)

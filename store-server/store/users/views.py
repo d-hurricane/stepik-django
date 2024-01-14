@@ -2,7 +2,12 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
+from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, UpdateView
+from users.models import (
+    User,
+    EmailVerification,
+)
 from users.forms import (
     UserLoginForm,
     UserRegistrationForm,
@@ -11,6 +16,8 @@ from users.forms import (
 from products.views import (
     Basket,
 )
+
+import uuid
 
 
 class UserLoginView(LoginView):
@@ -40,3 +47,14 @@ class UserProfileView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['basket'] = Basket.objects.filter(user=self.object)
         return context
+
+
+class EmailVerificationView(TemplateView):
+    template_name = 'users/email_verification.html'
+    extra_context = {'title': 'Store - Подтверждение почты'}
+
+    def get(self, request, *args, **kwargs):
+        user = User.objects.get(id=kwargs['user'])
+        code = kwargs['code']
+        EmailVerification.update(user, code)
+        return super().get(request, *args, **kwargs)

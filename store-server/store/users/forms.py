@@ -72,6 +72,11 @@ class UserRegistrationForm(BaseUserCreationForm):
             'placeholder': 'Подтвердите пароль',
         }))
 
+    def save(self, commit=True):
+        user = super(UserRegistrationForm, self).save(commit=True)
+        models.EmailVerification.create(user)
+        return user
+
 
 class UserProfileForm(BaseUserChangeForm):
     class Meta:
